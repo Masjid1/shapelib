@@ -197,9 +197,8 @@ def linestr_to_tube(l, diam, wallwidth=0.05, begin='closed', end='flat'):
         perp0 = perpendicular_at(l, p, total_diam)
         p2 = line_extrapolate_point(l, p, (r+wallwidth)*1.01)
         perp1 = perpendicular_at(l, p2, total_diam)
-        mask = asPolygon(linering(perp0.coords[0], perp0.coords[1], perp1.coords[1], perp1.coords[0])).convex_hull
-        #mask = asPolygon(linering(perp0.coords[0], perp0.coords[1], perp1.coords[1], perp1.coords[0]))
-
+        mask = asPolygon(linering(perp0.coords[0], perp0.coords[1], 
+            perp1.coords[1], perp1.coords[0])).convex_hull
         return mask
     if begin == 'open':
         mask = get_mask(l, l.coords[0])
@@ -231,7 +230,9 @@ def perpendicular_at(line, point, length):
     else:
         r = 16
         while True:
-            refpoint = point.buffer(line.distance(point)+E, resolution=r).exterior.intersection(line)
+            refpoint = point.buffer(
+                line.distance(point)+E, resolution=r
+            ).exterior.intersection(line)
             if not refpoint.is_empty:
                 break
             else:

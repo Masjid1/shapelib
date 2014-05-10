@@ -4,18 +4,25 @@
 #
 ###########################################
 from matplotlib import pyplot
+from . import util
+from shapely.geometry import Polygon
 
-def geom_to_fig(geom, xrange=None, yrange=None, axis_visible=True, patchkws={}, aspect=1, linewidth=0.01, fig=None):
+def geom_to_fig(geom, xrange=None, yrange=None, axis_visible=True, 
+    patchkws={}, aspect=1, linewidth=0.01, fig=None):
     """
     convert a shapely geometry to a matplotlib figure
 
-    if xrange and yrange are given, use them. If not, the bounds of the geometry are used
+    If xrange and yrange are given, use them. 
+    If not, the bounds of the geometry are used
 
-    xrange: a number (xmax) or a tuple (xmin, xmax) defining the range to plot in the x coord
-    yrange: the same in the y coord. If these are not given, they are deduced from the coordinates of the geometry
+    xrange: a number (xmax) or a tuple (xmin, xmax) defining the range to plot 
+            in the x coord
+    yrange: the same in the y coord. If these are not given, they are deduced 
+            from the coordinates of the geometry
     axis_visible: show the axis and labels
     patchkws: passed as kws to descartes.PolygonPatch
-    aspect: parameter passed to axis.set_aspect (possible values: 'auto', or a number defining the ratio y/x)
+    aspect: parameter passed to axis.set_aspect (possible values: 'auto', 
+            or a number defining the ratio y/x)
     fig: used internally when called recursively for multi-geometries
 
     NB: This function relies on functionality provided by `descartes` 
@@ -25,7 +32,7 @@ def geom_to_fig(geom, xrange=None, yrange=None, axis_visible=True, patchkws={}, 
         import descartes
     except ImportError:
         raise ImportError("descartes are needed to plot geometries")
-    x0, y0, x1, y1 = _geomselectrange(geom, xrange, yrange)
+    x0, y0, x1, y1 = util.geom_getbounds(geom, xrange, yrange)
     if fig is None:
         #fig = pyplot.figure(1, figsize=(xsize, ysize))
         fig = pyplot.figure()
@@ -40,7 +47,9 @@ def geom_to_fig(geom, xrange=None, yrange=None, axis_visible=True, patchkws={}, 
             p = geom0.__geo_interface__
         else:
             for subgeom in geom.geoms:
-                fig = geom_to_fig(subgeom, xrange=(x0, x1), yrange=(y0, y1), show=False, axis_visible=axis_visible, patchkws=patchkws, aspect=aspect, fig=fig)
+                fig = geom_to_fig(subgeom, xrange=(x0, x1), yrange=(y0, y1), 
+                    show=False, axis_visible=axis_visible, patchkws=patchkws, 
+                    aspect=aspect, fig=fig)
             return fig
     if not axis_visible:
         ax.get_yaxis().set_visible(False)
@@ -53,16 +62,20 @@ def geom_to_fig(geom, xrange=None, yrange=None, axis_visible=True, patchkws={}, 
     ax.add_patch(pa)
     return fig
 
-def plot_geom(geom, xrange=None, yrange=None, width=0.01, axis_visible=True, patchkws={}, aspect=1):
+def geom_plot(geom, xrange=None, yrange=None, axis_visible=True, patchkws={}, aspect=1):
     """
-    xrange: a number (xmax) or a tuple (xmin, xmax) defining the range to plot in the x coord
-    yrange: the same in the y coord. If these are not given, they are deduced from the coordinates of the geometry
+    xrange: a number (xmax) or a tuple (xmin, xmax) defining the range to plot 
+            in the x coord
+    yrange: the same in the y coord. If these are not given, they are deduced 
+            from the coordinates of the geometry
     width: used only when the geometry is not a polygon but a line or a ring.
     axis_visible: show the axis and labels
     patchkws: passed as kws to descartes.PolygonPatch
-    aspect: parameter passed to axis.set_aspect (possible values: 'auto', or a number defining the ratio y/x)
+    aspect: parameter passed to axis.set_aspect (possible values: 'auto', 
+            or a number defining the ratio y/x)
     """
-    fig = geom_to_fig(geom, xrange=xrange, yrange=yrange, width=width, axis_visible=axis_visible, patchkws=patchkws, aspect=aspect)
+    fig = geom_to_fig(geom, xrange=xrange, yrange=yrange, 
+        axis_visible=axis_visible, patchkws=patchkws, aspect=aspect)
     fig.show()
     
 def geom_to_picture(geom, filename, xrange=None, yrange=None, axis_visible=True, 
@@ -93,9 +106,10 @@ def geom_to_picture(geom, filename, xrange=None, yrange=None, axis_visible=True,
     isinteractive = pyplot.isinteractive()
     if isinteractive:
         pyplot.ioff()
-    fig = geom_to_fig(geom, xrange=xrange, yrange=yrange, axis_visible=axis_visible, patchkws=patchkws)
+    fig = geom_to_fig(geom, xrange=xrange, yrange=yrange, 
+        axis_visible=axis_visible, patchkws=patchkws)
     ax = fig.gca()
-    x0, y0, x1, y1 = _geomselectrange(geom, xrange, yrange)
+    x0, y0, x1, y1 = util.geom_getbounds(geom, xrange, yrange)
     xsize = (x1 - x0) * pixratio
     if dpi is None:
         dpi = 200 * xsize / 1128.
