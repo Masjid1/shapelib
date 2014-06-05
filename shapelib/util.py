@@ -4,6 +4,7 @@
 #
 ###################################
 import itertools as _itertools
+from numbers import Number as _Number
 
 def window(iterable, size, step):
     """
