@@ -24,3 +24,11 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+* INSTALLATION_
+* README_  
+* USAGE_
+
+.. _INSTALLATION: ./installation.rst
+.. _README: ../README.rst
+.. _USAGE: ./usage.rst
