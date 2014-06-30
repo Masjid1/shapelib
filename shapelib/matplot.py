@@ -48,8 +48,7 @@ def geom_to_fig(geom, xrange=None, yrange=None, axis_visible=True,
         else:
             for subgeom in geom.geoms:
                 fig = geom_to_fig(subgeom, xrange=(x0, x1), yrange=(y0, y1), 
-                    show=False, axis_visible=axis_visible, patchkws=patchkws, 
-                    aspect=aspect, fig=fig)
+                    axis_visible=axis_visible, patchkws=patchkws, aspect=aspect, fig=fig)
             return fig
     if not axis_visible:
         ax.get_yaxis().set_visible(False)
@@ -121,3 +120,16 @@ def geom_to_picture(geom, filename, xrange=None, yrange=None, axis_visible=True,
     if isinteractive:
         pyplot.ion()
     return fig
+
+#def plot_array(A, xsize=None, ysize=None):
+#    """
+#    A: a 2D numpy array
+#    xsize, ysize: the "realworld" size of the array
+#    """
+#    Y, X = A.shape
+#    if xsize is None:
+#        xsize = X 
+#    if ysize is None:
+#        ysize = Y
+#    if matplotlib_available():
+#        plt.imshow(A, origin='upper', extent=[0, xsize, 0, ysize])
