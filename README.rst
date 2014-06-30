@@ -33,7 +33,7 @@ Examples
 
 Rotate a geometry:
 
-.. code-bloc:: python
+.. code-block:: python
 
     import shapelib
     l = shapelib.line(0, 0, 1, 1)
@@ -41,7 +41,7 @@ Rotate a geometry:
 
 Find the angle of a tangent at a point:
 
-.. code-bloc:: python
+.. code-block:: python
 
     import shapelib
     circ = shapelib.circle(1, 1, 1)
@@ -51,7 +51,7 @@ Find the angle of a tangent at a point:
 
 Rasterize a geometry to an 2D array:
 
-.. code-bloc:: python
+.. code-block:: python
 
     import shapelib
     circ = shapelib.circle(1, 1, 1)
