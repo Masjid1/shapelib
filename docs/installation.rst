@@ -4,7 +4,7 @@ Installation
 
 At the command line::
 
-    $ easy_install shapelib
+    $ pip install shapelib
 
 Or, if you have virtualenvwrapper installed::
 

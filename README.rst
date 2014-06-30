@@ -27,3 +27,35 @@ Incentive
 ---------
 
 shapelib started as a set of utilities to build geometric shapes as part of acoustic simulations (walls, ducts, tubes). It proved to be useful outside of this specific domain.
+
+Examples
+--------
+
+Rotate a geometry::
+
+    import shapelib
+    l = shapelib.line(0, 0, 1, 1)
+    rot = shapelib.rotate(l, 90)
+
+Find the angle of a tangent at a point::
+
+    import shapelib
+    circ = shapelib.circle(1, 1, 1)
+    radians = shapelib.angle_at(circ, (1, 0))
+    print(math.degrees(radians))
+    # 270
+
+Rasterize a geometry to an 2D array::
+
+    import shapelib
+    circ = shapelib.circle(1, 1, 1)
+    img = shapelib.rasterize(circ, 300)
+
+
+
+Documentation
+-------------
+
+See the docs_
+
+.. _docs : docs/index.rst
