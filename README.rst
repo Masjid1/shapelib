@@ -31,13 +31,17 @@ shapelib started as a set of utilities to build geometric shapes as part of acou
 Examples
 --------
 
-Rotate a geometry::
+Rotate a geometry:
+
+.. code-bloc:: python
 
     import shapelib
     l = shapelib.line(0, 0, 1, 1)
     rot = shapelib.rotate(l, 90)
 
-Find the angle of a tangent at a point::
+Find the angle of a tangent at a point:
+
+.. code-bloc:: python
 
     import shapelib
     circ = shapelib.circle(1, 1, 1)
@@ -45,10 +49,13 @@ Find the angle of a tangent at a point::
     print(math.degrees(radians))
     # 270
 
-Rasterize a geometry to an 2D array::
+Rasterize a geometry to an 2D array:
+
+.. code-bloc:: python
 
     import shapelib
     circ = shapelib.circle(1, 1, 1)
+    # convert to a 2D matrix, 300 pixels pro unit
     img = shapelib.rasterize(circ, 300)
 
 

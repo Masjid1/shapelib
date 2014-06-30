@@ -6,6 +6,10 @@
 Welcome to shapelib's documentation!
 ======================================
 
+* INSTALLATION_
+* README_  
+* USAGE_
+
 Contents:
 
 .. toctree::
@@ -25,9 +29,6 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-* INSTALLATION_
-* README_  
-* USAGE_
 
 .. _INSTALLATION: ./installation.rst
 .. _README: ../README.rst
