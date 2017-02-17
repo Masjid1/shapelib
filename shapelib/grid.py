@@ -1,19 +1,26 @@
 ###########################################
 # Old and unused, will be probably removed
 ###########################################
+from __future__ import absolute_import
+from __future__ import print_function
 import numpy
 from shapely.topology import TopologicalError as _TopologicalError
+from shapely.geometry import box
+from six.moves import range
+from six.moves import zip
+
 
 class Grid(object):
     def __init__(self, x0, y0, x1, y1, stepx, stepy):
-        self.x0, self.y0, self.x1, self.y1, self.stepx, self.stepy = x0, y0, x1, y1, stepx, stepy
+        self.x0, self.y0, self.x1, self.y1 = x0, y0, x1, y1
+        self.stepx, self.stepy = stepx, stepy
         self.xs = numpy.arange(x0, x1, stepx)
         self.ys = numpy.arange(y0, y1, stepy)
         self.xlines = [box(x, y0, x+stepx, y1) for x in self.xs]
 
     def rasterize2(self, geom):
         x0, y0, x1, y1 = [int(value / self.stepx) for value in geom.bounds]
-        xs = range(x0, x1+1)
+        xs = list(range(x0, x1+1))
         mat = numpy.zeros((len(self.xs), len(self.ys)), dtype=float)
         stepy = self.stepy
         for x, band in zip(xs, self.xlines[x0:x1+1]):
@@ -29,9 +36,8 @@ class Grid(object):
     def rasterize(self, geom):
         x0, y0, x1, y1 = [int(value / self.stepx) for value in geom.bounds]
         mat = numpy.zeros((len(self.ys), len(self.xs)), dtype=float)
-        xs = range(x0, x1+1)
+        xs = list(range(x0, x1+1))
         stepy = self.stepy
-        times = []
         E = 1e-4
         for x, band in zip(xs, self.xlines[x0:x1+1]):
             try:
@@ -46,10 +52,8 @@ class Grid(object):
             if not hasattr(intersect_x, '__iter__'):
                 intersect_x = [intersect_x]
             for sub in intersect_x:
-                # faster calculation of upper and lower bounds, faster than _, y0, _, y1 = geom.bounds
                 ys = sub.ctypes[1::2]
                 y0 = int(min(ys)/stepy)
                 y1 = int(max(ys)/stepy)
                 mat[y0:y1+1, x] = 1
         return mat
-

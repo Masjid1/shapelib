@@ -4,9 +4,12 @@
 #
 ###########################################
 from __future__ import print_function
+from __future__ import absolute_import
 import numpy as np
 from collections import namedtuple as _namedtuple
 from numbers import Number as _Number
+import tempfile
+import os
 
 def _rasterize_matplotlib(geom, pixratio, xrange=None, yrange=None, imageout=None):
     """
@@ -21,7 +24,7 @@ def _rasterize_matplotlib(geom, pixratio, xrange=None, yrange=None, imageout=Non
 
     (array, imageout) or None if the backend is not available
     """
-    import tempfile, os
+    
     try:
         from matplotlib import image
     except ImportError:
@@ -33,12 +36,12 @@ def _rasterize_matplotlib(geom, pixratio, xrange=None, yrange=None, imageout=Non
         filename = tempfile.mktemp(suffix='.png')
         remove = True
     x0, y0, x1, y1 = _geomselectrange(geom, xrange, yrange)
-    cols = int(abs(x1-x0) * pixratio + 0.5)
-    rows = int(abs(y1-y0) * pixratio + 0.5)
+    # cols = int(abs(x1-x0) * pixratio + 0.5)
+    # rows = int(abs(y1-y0) * pixratio + 0.5)
     # save it to a black figure on white canvas
-    geom_to_picture(geom, filename=filename, xrange=xrange, yrange=yrange, 
-        pixratio=pixratio, patchkws={'color':'#000000'}, axis_visible=False)
-    im = (image.imread(filename)[:,:,0] < 0.9).astype(float)
+    geom_to_picture(geom, filename=filename, xrange=xrange, yrange=yrange,
+                    pixratio=pixratio, patchkws={'color':'#000000'}, axis_visible=False)
+    im = (image.imread(filename)[:, :, 0] < 0.9).astype(float)
     im = np.flipud(im)
     if remove:
         os.remove(filename)
@@ -53,6 +56,7 @@ def geom_to_picture(geom, filename, xrange, yrange, pixratio, patchkws, axis_vis
 
 def _geomselectrange(geom, xr, yr):
     x0, y0, x1, y1 = geom.bounds
+    
     def override(c0, c1, r):
         if r is not None:
             if isinstance(r, _Number):
@@ -60,6 +64,7 @@ def _geomselectrange(geom, xr, yr):
             else:
                 c0, c1 = r
         return c0, c1
+    
     x0, x1 = override(x0, x1, xr)
     y0, y1 = override(y0, y1, yr)
     return x0, y0, x1, y1
@@ -89,12 +94,12 @@ def _rasterize_rasterio(geom, pixratio, xrange=None, yrange=None, imageout=None)
         array_uint8 = np.flipud(array_uint8)
         if imageout:
             with rasterio.open(
-                imageout, "w", 
+                imageout, "w",
                 driver='GTiff',
                 width=cols, height=rows,
                 transform=transform,
                 count=1, dtype=np.uint8, nodata=0,
-                crs={'init':'EPSG:4326'}
+                crs={'init': 'EPSG:4326'}
             ) as out:
                 if foreground == 'black':
                     outarray = array_uint8

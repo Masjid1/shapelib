@@ -3,6 +3,7 @@
 # helpers
 #
 ###################################
+from __future__ import absolute_import
 import itertools as _itertools
 from numbers import Number as _Number
 
@@ -36,7 +37,7 @@ def geom_getbounds(geom, xr, yr):
     of selecting only a part of it
 
     geom: a geometry
-    xr: x range -> width or (start, end) 
+    xr: x range -> width or (start, end)
     yr: y range -> height or (start, end)
 
     xr and yr can be None, in which case the
@@ -48,6 +49,7 @@ def geom_getbounds(geom, xr, yr):
     (x0, y0, x1, y1)
     """
     x0, y0, x1, y1 = geom.bounds
+    
     def override(c0, c1, r):
         if r is not None:
             if isinstance(r, _Number):

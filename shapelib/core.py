@@ -1,24 +1,23 @@
 """
-Utility functions for computational geometry 
+Utility functions for computational geometry
 Built around shapely.
 """
 
 from __future__ import print_function, division, absolute_import
 import math
 from math import pi, sqrt
-from numbers import Number as _Number 
+from numbers import Number as _Number
 import array
-import numpy
 
 from shapely.geometry import (
-    LineString, Polygon, Point, box, asPoint, 
+    LineString, Polygon, Point, box, asPoint,
     asPolygon, MultiPoint, MultiLineString
-    )
+)
 from shapely.geometry.polygon import LinearRing
-
 from shapely.affinity import rotate
 from shapely.topology import TopologicalError as _TopologicalError
 from . import util
+from six.moves import map
 
 def _normalize_point(p):
     if isinstance(p, (tuple, list)):
@@ -40,7 +39,7 @@ def _normalize_point(p):
 def _normalize_points(points):
     if all(isinstance(p, _Number) for p in points):
         points = util.window(points, 2, 2)
-    coords = map(_normalize_point, points)
+    coords = list(map(_normalize_point, points))
     return coords
 
 ###############################################
@@ -91,7 +90,7 @@ def ring(centerx, centery, radius, width):
     a circular ring
     """
     c_out = Point(centerx, centery).buffer(radius)
-    c_in  = Point(centerx, centery).buffer(radius - width)
+    c_in = Point(centerx, centery).buffer(radius - width)
     return c_out.difference(c_in)
 
 def line(x0, y0, x1, y1, width=None):
@@ -118,7 +117,7 @@ def linering(*points):
 
 def line_extrapolate_point(l, p, length):
     """
-    Return a Point p2 which would extend the line `l` so that it 
+    Return a Point p2 which would extend the line `l` so that it
     would have a length of `length`
 
     l: a line
@@ -172,8 +171,8 @@ def tube(points, diam, wallwidth=0.05, begin='closed', end='flat'):
     """
     create a tube.
 
-    A tube is a set of two parallel lines, where the edges are either 
-    closed (curved), open, or flat 
+    A tube is a set of two parallel lines, where the edges are either
+    closed (curved), open, or flat
     """
     l = linestr(*points)
     return linestr_to_tube(l, diam=diam, wallwidth=wallwidth, begin=begin, end=end)
@@ -185,7 +184,7 @@ def linestr_to_tube(l, diam, wallwidth=0.05, begin='closed', end='flat'):
     l:          a line string
     diam:       inner diameter of the tube
     wallwidth:  width of the wall of the tube
-    begin, end: one of 'closed', 'flat', 'open'. 
+    begin, end: one of 'closed', 'flat', 'open'.
                 Indicates the shape of the extremes.
     """
     r = diam * 0.5
@@ -197,8 +196,9 @@ def linestr_to_tube(l, diam, wallwidth=0.05, begin='closed', end='flat'):
         perp0 = perpendicular_at(l, p, total_diam)
         p2 = line_extrapolate_point(l, p, (r+wallwidth)*1.01)
         perp1 = perpendicular_at(l, p2, total_diam)
-        mask = asPolygon(linering(perp0.coords[0], perp0.coords[1], 
-            perp1.coords[1], perp1.coords[0])).convex_hull
+        mask = asPolygon(
+            linering(perp0.coords[0], perp0.coords[1], perp1.coords[1], perp1.coords[0])
+        ).convex_hull
         return mask
     if begin == 'open':
         mask = get_mask(l, l.coords[0])
@@ -230,9 +230,7 @@ def perpendicular_at(line, point, length):
     else:
         r = 16
         while True:
-            refpoint = point.buffer(
-                line.distance(point)+E, resolution=r
-            ).exterior.intersection(line)
+            refpoint = point.buffer(line.distance(point)+E, resolution=r).exterior.intersection(line)
             if not refpoint.is_empty:
                 break
             else:
@@ -251,7 +249,7 @@ def line_angle_at(line, point, h=0.001):
     """
     return the angle of `line` at the `point` given. I
 
-    If point is not in the line, return the angle at the 
+    If point is not in the line, return the angle at the
     nearest point within the line.
     """
     point = Point(*_normalize_point(point))
@@ -260,7 +258,8 @@ def line_angle_at(line, point, h=0.001):
     bufdist = min(line.length, h)
     c = point.buffer(bufdist).exterior
     points = c.intersection(line)
-    if isinstance(points, Point):   # only one intersection, point is one of the extremes
+    if isinstance(points, Point):
+        # only one intersection, point is one of the extremes
         a = points
         b = line.intersection(point.buffer(bufdist*2).exterior)
         if not isinstance(b, Point):
@@ -332,6 +331,7 @@ def angle_from_points(a, b):
     alpha = alpha % (pi*2)
     return alpha
 
+
 def edge(geom):
     """
     return a polygon representing the edge of `geom`
@@ -376,7 +376,8 @@ def nearest_point(geom, p, eps=None):
         assert abs(n.distance(p) - geom.distance(p)) < 1e-3
         return n
 
-    if p2.is_empty: # eps is too small, try with a larger one
+    if p2.is_empty:
+        # eps is too small, try with a larger one
         return nearest_point(geom, p, eps*6)
 
     if isinstance(p2, MultiPoint):
@@ -412,8 +413,3 @@ def tight_envelope(geom):
     elif isinstance(geom, Polygon):
         g00 = asPolygon(geom.exterior)
     return g00
-
-
-
-
-
